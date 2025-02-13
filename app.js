@@ -9,18 +9,19 @@ app.use(express.json());
 let tareas = [];
 let server;
 
-// Helper para manejar errores de ID
+// Función para buscar una tarea por ID
 const findTareaById = (id) => {
   const tarea = tareas.find(t => t.id === id);
   if (!tarea) throw { status: 404, message: 'Tarea no encontrada' };
   return tarea;
 };
 
-// --- Endpoints ---
+// Ruta principal
 app.get('/', (req, res) => {
-  res.send('API To-Do List ');
+  res.send('API To-Do List');
 });
 
+// Crear una nueva tarea
 app.post('/tareas', (req, res) => {
   const { titulo, descripcion } = req.body;
   
@@ -39,6 +40,7 @@ app.post('/tareas', (req, res) => {
   res.status(201).json(nuevaTarea);
 });
 
+// Obtener todas las tareas (con opción de filtrar por estado)
 app.get('/tareas', (req, res) => {
   const { completado } = req.query;
   let resultado = tareas;
@@ -50,6 +52,7 @@ app.get('/tareas', (req, res) => {
   res.json(resultado);
 });
 
+// Obtener una tarea por ID
 app.get('/tareas/:id', (req, res) => {
   try {
     const tarea = findTareaById(req.params.id);
@@ -59,6 +62,7 @@ app.get('/tareas/:id', (req, res) => {
   }
 });
 
+// Actualizar una tarea por ID
 app.patch('/tareas/:id', (req, res) => {
   try {
     const tarea = findTareaById(req.params.id);
@@ -85,6 +89,7 @@ app.patch('/tareas/:id', (req, res) => {
   }
 });
 
+// Eliminar una tarea por ID
 app.delete('/tareas/:id', (req, res) => {
   try {
     const index = tareas.findIndex(t => t.id === req.params.id);
@@ -97,12 +102,13 @@ app.delete('/tareas/:id', (req, res) => {
   }
 });
 
+// Middleware para manejar errores inesperados
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Algo salió mal en el servidor' });
 });
 
-// Configuración del servidor y exportaciones
+// Iniciar el servidor si es ejecutado directamente
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   server = app.listen(PORT, () => {
